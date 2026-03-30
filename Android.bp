@@ -1,0 +1,71 @@
+cc_library_shared {
+    name: "libOcamavm",
+
+    srcs: [
+        "Ocamavm.cpp",
+        "Ocamconfig.cpp",
+        "mvtpublic.cpp",
+    ],
+
+    local_include_dirs: [
+        "include",
+    ],
+    export_include_dirs: [
+        "include",
+    ],
+
+    shared_libs: [
+        "libEGL",
+        "libGLESv2",
+    ],
+
+    rtti: true,
+
+    cflags: [
+        "-DGL_GLEXT_PROTOTYPES",
+        "-DEGL_EGLEXT_PROTOTYPES",
+        "-Wno-unused-parameter",
+        "-Wno-unused-variable",
+        "-Wno-unused-function",
+        "-Wno-macro-redefined",
+        "-Wno-missing-field-initializers",
+        "-Wno-writable-strings",
+        "-Wno-uninitialized",
+        "-Wno-format",
+        "-Wno-unused-private-field",
+    ],
+}
+
+cc_binary {
+    name: "ocamavm_test",
+
+    srcs: [
+        "demo/main.cpp",
+    ],
+
+    local_include_dirs: [
+        "include",
+    ],
+
+    shared_libs: [
+        "libOcamavm",
+        "libEGL",
+        "libGLESv2",
+    ],
+
+    rtti: true,
+
+    cflags: [
+        "-DGL_GLEXT_PROTOTYPES",
+        "-DEGL_EGLEXT_PROTOTYPES",
+        "-Wno-unused-parameter",
+        "-Wno-unused-variable",
+        "-Wno-unused-function",
+        "-Wno-macro-redefined",
+        "-Wno-missing-field-initializers",
+        "-Wno-writable-strings",
+        "-Wno-uninitialized",
+        "-Wno-format",
+        "-Wno-unused-private-field",
+    ],
+}
