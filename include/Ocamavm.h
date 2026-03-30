@@ -23,6 +23,7 @@ public:
     static OCamRender *instance();
     /*前（0）左（1）后（2）右（3）*/
     bool Distortimg(int nCamera, const char* yuv, int w, int h, RgbaFrameCallback callback);
+    /*支持手动指定传出分辨率 set outW/outH ****** srcW/srcH：是原图尺寸*/
     bool Distortimg(int nCamera, const char* yuv, int srcW, int srcH, int outW, int outH, RgbaFrameCallback callback);
 
 private:
