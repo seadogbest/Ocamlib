@@ -499,15 +499,17 @@ void OCamRender::yuvtoNv12(int nCamera,const char* yuv, char* nv12, int w, int h
 
     const size_t srcStride = static_cast<size_t>(w) * 2;//源数据每一行占多少字节 输入YUYV 每两个2像素占4个字节 Y0 U0 Y1 V1
 
+    /*处理Y平面*/
     for (int row = 0; row < h; ++row) {
-        const uint8_t* srcRow = src + static_cast<size_t>(row) * srcStride;
-        uint8_t* dstRow = dstY + static_cast<size_t>(row) * static_cast<size_t>(w);
+        const uint8_t* srcRow = src + static_cast<size_t>(row) * srcStride;//计算每一行的开头索引
+        uint8_t* dstRow = dstY + static_cast<size_t>(row) * static_cast<size_t>(w);//计算处于Y平面的位置
         for (int col = 0; col < w; ++col) {
-            dstRow[col] = srcRow[static_cast<size_t>(col) * 2];
+            dstRow[col] = srcRow[static_cast<size_t>(col) * 2];//yuv格式单像素占用2字节
         }
     }
 
-    for (int row = 0; row < h; row += 2) {
+    /*处理UV平面*/
+    for (int row = 0; row < h; row += 2) {//降采样 每次采两行
         const uint8_t* srcRow0 = src + static_cast<size_t>(row) * srcStride;
         const uint8_t* srcRow1 = (row + 1 < h) ? (src + static_cast<size_t>(row + 1) * srcStride) : srcRow0;
         uint8_t* dstRow = dstUV + static_cast<size_t>(row / 2) * static_cast<size_t>(w);
@@ -568,6 +570,16 @@ bool OCamRender::Distortimg(int nCamera, const char* yuyv, int srcW, int srcH, i
     std::vector<uint8_t> cpuBuffer(static_cast<size_t>(outW) * static_cast<size_t>(outH) * 4u);
     glReadPixels(0, 0, outW, outH, GL_RGBA, GL_UNSIGNED_BYTE, cpuBuffer.data());
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    callback(outW, outH, static_cast<int>(cpuBuffer.size()), reinterpret_cast<const char*>(cpuBuffer.data()));
+    /*做图片翻转*/
+    std::vector<uint8_t> flipped(cpuBuffer.size());
+    const size_t stride = static_cast<size_t>(outW) * 4u;
+    for(int y = 0; y< outH; ++y)//逐行拷贝
+    {   
+        const size_t src = static_cast<size_t>(outH - 1 - y) * stride;
+        const size_t dst = static_cast<size_t>(y) * stride;
+        memcpy(flipped.data() + dst, cpuBuffer.data() + src, stride);
+    }
+
+    callback(outW, outH, static_cast<int>(flipped.size()), reinterpret_cast<const char*>(flipped.data()));
     return true;
 }
